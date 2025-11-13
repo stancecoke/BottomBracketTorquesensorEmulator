@@ -73,6 +73,11 @@ uint16_t ADC_VAL[2];
 
 char UART_TX_Buffer[100];
 char UART_RX_Buffer[100];
+
+CAN_TxHeaderTypeDef   TxHeader;
+CAN_RxHeaderTypeDef   RxHeader;
+uint32_t              TxMailbox;
+uint8_t 			  TxData[8];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -169,6 +174,18 @@ int main(void)
 		  tim1_counter=0;
 		  sprintf(USB_Tx_Buffer, "%d, %d, %d, %d, %d, %d, %d\r\n",OutputActive, ADC_VAL[0],ADC_VAL[1],Torque_mV,PAS_setpoint,Cadence_rpm,DutyCycle);
 		  Tx_len = strlen(USB_Tx_Buffer);
+
+			TxData[0] = (Torque_mV)&0xFF; //torque LSB
+			TxData[1] = (Torque_mV>>8)&0xFF; //torque MSB
+			TxData[2] = Cadence_rpm;
+			TxData[3] = 0x01; //progressive byte?!
+
+			if (HAL_CAN_AddTxMessage(&hcan, &TxHeader, TxData, &TxMailbox) != HAL_OK)
+			  {
+			   // Transmission request Error
+			   Error_Handler();
+			  }
+
 		  //CDC_Transmit_FS((uint8_t*) USB_Tx_Buffer, Tx_len);
 	  }
 		if (OutputActive) {
@@ -207,6 +224,8 @@ int main(void)
 			TIM1->CCR1 = 1272;
 			HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, 0);
 			HAL_GPIO_WritePin(PAS_signal_GPIO_Port, PAS_signal_Pin, 0);
+			Cadence_rpm=0;
+			Torque_mV=700;
 		}
     /* USER CODE END WHILE */
 
@@ -332,17 +351,19 @@ static void MX_CAN_Init(void)
 
   /* USER CODE END CAN_Init 1 */
   hcan.Instance = CAN1;
-  hcan.Init.Prescaler = 16;
+  hcan.Init.Prescaler = 9;
   hcan.Init.Mode = CAN_MODE_NORMAL;
-  hcan.Init.SyncJumpWidth = CAN_SJW_1TQ;
-  hcan.Init.TimeSeg1 = CAN_BS1_1TQ;
-  hcan.Init.TimeSeg2 = CAN_BS2_1TQ;
+  hcan.Init.SyncJumpWidth = CAN_SJW_4TQ;
+  hcan.Init.TimeSeg1 = CAN_BS1_13TQ;
+  hcan.Init.TimeSeg2 = CAN_BS2_2TQ;
   hcan.Init.TimeTriggeredMode = DISABLE;
   hcan.Init.AutoBusOff = DISABLE;
   hcan.Init.AutoWakeUp = DISABLE;
-  hcan.Init.AutoRetransmission = DISABLE;
+  hcan.Init.AutoRetransmission = ENABLE;
   hcan.Init.ReceiveFifoLocked = DISABLE;
   hcan.Init.TransmitFifoPriority = DISABLE;
+
+
   if (HAL_CAN_Init(&hcan) != HAL_OK)
   {
     Error_Handler();
@@ -389,10 +410,16 @@ static void MX_CAN_Init(void)
     }
 
     /*##-5- Configure Transmission process #####################################*/
-
+    TxHeader.StdId = 0x00;
+    TxHeader.ExtId = 0x01F83100; //Frame ID for Torquesensor message
+    TxHeader.RTR = CAN_RTR_DATA;
+    TxHeader.IDE = CAN_ID_EXT;
+    TxHeader.DLC = 4;
+    TxHeader.TransmitGlobalTime = DISABLE;
   /* USER CODE END CAN_Init 2 */
 
 }
+
 
 /**
   * @brief TIM1 Initialization Function
