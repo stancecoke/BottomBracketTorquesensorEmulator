@@ -172,10 +172,10 @@ int main(void)
 		  //CDC_Transmit_FS((uint8_t*) USB_Tx_Buffer, Tx_len);
 	  }
 		if (OutputActive) {
-			PAS_setpoint = map (ADC_VAL[0], 0, 4095, 2000, 500);
-			Cadence_rpm = 60000/PAS_setpoint;
-			Torque_setpoint = map (ADC_VAL[1], 0, 4095, 1272, 5999);
-			Torque_mV = map (Torque_setpoint, 0, 6000, 0, 3300);
+			PAS_setpoint = map (ADC_VAL[0], 0, 4095, 1900, 500);
+			Cadence_rpm = 64000/PAS_setpoint;
+			Torque_setpoint = map (ADC_VAL[1], 0, 4095, 763, 3600);
+			Torque_mV = map (Torque_setpoint, 0, 3600, 0, 3300);
 			if (PAS_counter > PAS_setpoint>>1) {
 				HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, 1);
 				HAL_GPIO_WritePin(Q_PAS1_GPIO_Port, Q_PAS1_Pin, 1);
@@ -416,7 +416,7 @@ static void MX_TIM1_Init(void)
 	  htim1.Instance = TIM1;
 	  htim1.Init.Prescaler = 0;
 	  htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-	  htim1.Init.Period = 6000;
+	  htim1.Init.Period = 3600;
 	  htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
 	  htim1.Init.RepetitionCounter = 0;
 	  htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
@@ -619,7 +619,7 @@ static void MX_GPIO_Init(void)
    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
    GPIO_InitStruct.Pull = GPIO_NOPULL;
    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */

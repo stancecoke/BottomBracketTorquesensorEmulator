@@ -91,11 +91,11 @@ void Error_Handler(void);
 #define Torque_setpoint_GPIO_Port GPIOA
 #define Torquesignal_Pin GPIO_PIN_8
 #define Torquesignal_GPIO_Port GPIOA
-#define PAS_signal_Pin GPIO_PIN_9
+#define PAS_signal_Pin GPIO_PIN_3
 #define PAS_signal_GPIO_Port GPIOA
-#define Q_PAS1_Pin GPIO_PIN_9
+#define Q_PAS1_Pin GPIO_PIN_10
 #define Q_PAS1_GPIO_Port GPIOA
-#define Q_PAS2_Pin GPIO_PIN_10
+#define Q_PAS2_Pin GPIO_PIN_9
 #define Q_PAS2_GPIO_Port GPIOA
 /* USER CODE END Private defines */
 
