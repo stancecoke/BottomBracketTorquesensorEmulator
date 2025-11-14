@@ -183,7 +183,7 @@ int main(void)
 			if (HAL_CAN_AddTxMessage(&hcan, &TxHeader, TxData, &TxMailbox) != HAL_OK)
 			  {
 			   // Transmission request Error
-			   Error_Handler();
+			   //Error_Handler();
 			  }
 
 		  //CDC_Transmit_FS((uint8_t*) USB_Tx_Buffer, Tx_len);
