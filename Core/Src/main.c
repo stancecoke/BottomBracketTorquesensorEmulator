@@ -639,7 +639,7 @@ static void MX_GPIO_Init(void)
    HAL_GPIO_Init(LED_GPIO_Port, &GPIO_InitStruct);
 
    /*Configure GPIO pin : UserButton_Pin */
-   GPIO_InitStruct.Pin = UserButton_Pin;
+   GPIO_InitStruct.Pin = UserButton_Pin|Jumper_Pin;
    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
    GPIO_InitStruct.Pull = GPIO_PULLUP;
    HAL_GPIO_Init(UserButton_GPIO_Port, &GPIO_InitStruct);
