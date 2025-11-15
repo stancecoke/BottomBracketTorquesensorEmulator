@@ -64,6 +64,7 @@ uint16_t DutyCycle=50;
 char USB_Tx_Buffer[64];
 uint16_t Tx_len;
 bool ButtonState=true;
+bool JumperState=true;
 bool ButtonState_old=true;
 bool OutputActive=false;
 bool Q_PAS1_old=0;
@@ -160,6 +161,7 @@ int main(void)
   {
 
 	  ButtonState=HAL_GPIO_ReadPin (UserButton_GPIO_Port, UserButton_Pin);
+	  JumperState=HAL_GPIO_ReadPin (Jumper_GPIO_Port, Jumper_Pin);
 	  if(ButtonState!=ButtonState_old&&debounce>50){
 		  ButtonState_old=ButtonState;
 		  debounce =0;
@@ -218,14 +220,22 @@ int main(void)
 			Q_PAS1_old= HAL_GPIO_ReadPin(Q_PAS1_GPIO_Port, Q_PAS1_Pin);
 			Q_PAS2_old= HAL_GPIO_ReadPin(Q_PAS2_GPIO_Port, Q_PAS2_Pin);
 
-			TIM1->CCR1 = Torque_setpoint;
+			if(JumperState)TIM1->CCR1 = Torque_setpoint;
+			else TIM1->CCR1 = 0;
 		}
 		else{
-			TIM1->CCR1 = 1272;
+
 			HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, 0);
 			HAL_GPIO_WritePin(PAS_signal_GPIO_Port, PAS_signal_Pin, 0);
 			Cadence_rpm=0;
-			Torque_mV=700;
+			if(JumperState){
+				Torque_mV=700;
+				TIM1->CCR1 = 1272;
+			}
+			else {
+				Torque_mV=0;
+				TIM1->CCR1 = 0;
+			}
 		}
     /* USER CODE END WHILE */
 

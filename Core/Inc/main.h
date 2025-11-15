@@ -83,6 +83,8 @@ void Error_Handler(void);
 /* USER CODE BEGIN Private defines */
 #define LED_Pin GPIO_PIN_13
 #define LED_GPIO_Port GPIOC
+#define Jumper_Pin GPIO_PIN_4
+#define Jumper_GPIO_Port GPIOA
 #define UserButton_Pin GPIO_PIN_0
 #define UserButton_GPIO_Port GPIOA
 #define Cadence_setpoint_Pin GPIO_PIN_1
