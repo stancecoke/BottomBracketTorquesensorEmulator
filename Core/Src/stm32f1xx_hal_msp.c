@@ -280,10 +280,10 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
     /**TIM1 GPIO Configuration
     PA8     ------> TIM1_CH1
     */
-    GPIO_InitStruct.Pin = Torque_Pin;
+    GPIO_InitStruct.Pin = Torquesignal_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(Torque_GPIO_Port, &GPIO_InitStruct);
+    HAL_GPIO_Init(Torquesignal_GPIO_Port, &GPIO_InitStruct);
 
   /* USER CODE BEGIN TIM1_MspPostInit 1 */
 
@@ -346,15 +346,15 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
     PA9     ------> USART1_TX
     PA10     ------> USART1_RX
     */
-    GPIO_InitStruct.Pin = PAS2_Pin;
+    GPIO_InitStruct.Pin = Q_PAS2_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-    HAL_GPIO_Init(PAS2_GPIO_Port, &GPIO_InitStruct);
+    HAL_GPIO_Init(Q_PAS2_GPIO_Port, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = PAS1_Pin;
+    GPIO_InitStruct.Pin = Q_PAS1_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(PAS1_GPIO_Port, &GPIO_InitStruct);
+    HAL_GPIO_Init(Q_PAS1_GPIO_Port, &GPIO_InitStruct);
 
   /* USER CODE BEGIN USART1_MspInit 1 */
 
@@ -383,7 +383,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
     PA9     ------> USART1_TX
     PA10     ------> USART1_RX
     */
-    HAL_GPIO_DeInit(GPIOA, PAS2_Pin|PAS1_Pin);
+    HAL_GPIO_DeInit(GPIOA, Q_PAS2_Pin|Q_PAS1_Pin);
 
   /* USER CODE BEGIN USART1_MspDeInit 1 */
 

@@ -177,6 +177,7 @@ int main(void)
 		  sprintf(USB_Tx_Buffer, "%d, %d, %d, %d, %d, %d, %d\r\n",OutputActive, ADC_VAL[0],ADC_VAL[1],Torque_mV,PAS_setpoint,Cadence_rpm,DutyCycle);
 		  Tx_len = strlen(USB_Tx_Buffer);
 
+		  if(JumperState){ //send CAN message only in torquesensor mode
 			TxData[0] = (Torque_mV)&0xFF; //torque LSB
 			TxData[1] = (Torque_mV>>8)&0xFF; //torque MSB
 			TxData[2] = Cadence_rpm;
@@ -187,7 +188,7 @@ int main(void)
 			   // Transmission request Error
 			   //Error_Handler();
 			  }
-
+		  }
 		  //CDC_Transmit_FS((uint8_t*) USB_Tx_Buffer, Tx_len);
 	  }
 		if (OutputActive) {
@@ -197,10 +198,12 @@ int main(void)
 			Torque_mV = map (Torque_setpoint, 0, 3600, 0, 3300);
 			if (PAS_counter > PAS_setpoint>>1) {
 				HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, 1);
+				HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, 1);
 				HAL_GPIO_WritePin(Q_PAS1_GPIO_Port, Q_PAS1_Pin, 1);
 			}
 			if (PAS_counter > PAS_setpoint) {
 				HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, 0);
+				HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, 0);
 				HAL_GPIO_WritePin(Q_PAS1_GPIO_Port, Q_PAS1_Pin, 0);
 				PAS_counter = 0;
 			}
@@ -619,11 +622,13 @@ static void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+   HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
 
    /*Configure GPIO pin Output Level */
    HAL_GPIO_WritePin(PAS_signal_GPIO_Port, PAS_signal_Pin, GPIO_PIN_RESET);
@@ -637,6 +642,13 @@ static void MX_GPIO_Init(void)
    GPIO_InitStruct.Pull = GPIO_NOPULL;
    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
    HAL_GPIO_Init(LED_GPIO_Port, &GPIO_InitStruct);
+
+   /*Configure GPIO pin : LED2_Pin */
+   GPIO_InitStruct.Pin = LED2_Pin;
+   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+   GPIO_InitStruct.Pull = GPIO_NOPULL;
+   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+   HAL_GPIO_Init(LED2_GPIO_Port, &GPIO_InitStruct);
 
    /*Configure GPIO pin : UserButton_Pin */
    GPIO_InitStruct.Pin = UserButton_Pin|Jumper_Pin;

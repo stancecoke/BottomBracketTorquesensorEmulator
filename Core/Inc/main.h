@@ -63,42 +63,30 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define Cadence_LED_Pin GPIO_PIN_13
-#define Cadence_LED_GPIO_Port GPIOC
-#define Start_Stop_Button_Pin GPIO_PIN_0
-#define Start_Stop_Button_GPIO_Port GPIOA
-#define Cadence_setpoint_Pin GPIO_PIN_1
-#define Cadence_setpoint_GPIO_Port GPIOA
-#define Torque_setpoint_Pin GPIO_PIN_2
-#define Torque_setpoint_GPIO_Port GPIOA
-#define Speed_dir_Pin GPIO_PIN_3
-#define Speed_dir_GPIO_Port GPIOA
-#define Torque_Pin GPIO_PIN_8
-#define Torque_GPIO_Port GPIOA
-#define PAS2_Pin GPIO_PIN_9
-#define PAS2_GPIO_Port GPIOA
-#define PAS1_Pin GPIO_PIN_10
-#define PAS1_GPIO_Port GPIOA
+
 
 /* USER CODE BEGIN Private defines */
-#define LED_Pin GPIO_PIN_13
-#define LED_GPIO_Port GPIOC
+
 #define Jumper_Pin GPIO_PIN_4
 #define Jumper_GPIO_Port GPIOA
+#define LED_Pin GPIO_PIN_13
+#define LED_GPIO_Port GPIOC
+#define LED2_Pin GPIO_PIN_2
+#define LED2_GPIO_Port GPIOB
 #define UserButton_Pin GPIO_PIN_0
 #define UserButton_GPIO_Port GPIOA
 #define Cadence_setpoint_Pin GPIO_PIN_1
 #define Cadence_setpoint_GPIO_Port GPIOA
 #define Torque_setpoint_Pin GPIO_PIN_2
 #define Torque_setpoint_GPIO_Port GPIOA
-#define Torquesignal_Pin GPIO_PIN_8
-#define Torquesignal_GPIO_Port GPIOA
 #define PAS_signal_Pin GPIO_PIN_3
 #define PAS_signal_GPIO_Port GPIOA
-#define Q_PAS1_Pin GPIO_PIN_10
-#define Q_PAS1_GPIO_Port GPIOA
+#define Torquesignal_Pin GPIO_PIN_8
+#define Torquesignal_GPIO_Port GPIOA
 #define Q_PAS2_Pin GPIO_PIN_9
 #define Q_PAS2_GPIO_Port GPIOA
+#define Q_PAS1_Pin GPIO_PIN_10
+#define Q_PAS1_GPIO_Port GPIOA
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
