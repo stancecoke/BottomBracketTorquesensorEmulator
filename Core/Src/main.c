@@ -244,16 +244,17 @@ int main(void)
 				HAL_GPIO_WritePin(Q_PAS2_GPIO_Port, Q_PAS2_Pin, 1);
 			}
 			if(!Q_PAS2state&&Q_PAS2state!=Q_PAS2_old) {
+
+				HAL_GPIO_WritePin(Q_PAS2_GPIO_Port, Q_PAS2_Pin, 0);
+
+			}
+			//speed/direction signal generation
+			if(Q_PAS2state!=Q_PAS2_old||Q_PAS1state!=Q_PAS1_old){
 				//generate sine-shaped torque signal
 				if(JumperState)TIM1->CCR1 = (sine_curve[half_revolution_counter]*Torque_setpoint)>>8;
 				else TIM1->CCR1 = 0;
 				if (half_revolution_counter<16)half_revolution_counter++;
 				else half_revolution_counter=0;
-				HAL_GPIO_WritePin(Q_PAS2_GPIO_Port, Q_PAS2_Pin, 0);
-
-			}
-			//speed/direction signal generation
-			if(HAL_GPIO_ReadPin(Q_PAS2_GPIO_Port, Q_PAS2_Pin)!=Q_PAS2_old||HAL_GPIO_ReadPin(Q_PAS1_GPIO_Port, Q_PAS1_Pin)!=Q_PAS1_old){
 				HAL_GPIO_TogglePin(PAS_signal_GPIO_Port, PAS_signal_Pin);
 				}
 			Q_PAS1_old= Q_PAS1state;
