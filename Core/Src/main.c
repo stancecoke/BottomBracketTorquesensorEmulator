@@ -61,6 +61,25 @@ uint16_t Torque_mV=700;
 uint16_t Cadence_rpm=30;
 uint16_t PAS_setpoint=16000;
 uint16_t DutyCycle=50;
+uint8_t half_revolution_counter=0;
+uint8_t sine_curve[16]={
+		49,
+		97,
+		142,
+		181,
+		212,
+		236,
+		251,
+		255,
+		251,
+		236,
+		212,
+		181,
+		142,
+		97,
+		49,
+		0
+};
 char USB_Tx_Buffer[64];
 uint16_t Tx_len;
 bool ButtonState=true;
@@ -69,6 +88,8 @@ bool ButtonState_old=true;
 bool OutputActive=false;
 bool Q_PAS1_old=0;
 bool Q_PAS2_old=0;
+bool Q_PAS1state=0;
+bool Q_PAS2state=0;
 uint16_t debounce;
 uint16_t ADC_VAL[2];
 
@@ -194,37 +215,51 @@ int main(void)
 		if (OutputActive) {
 			PAS_setpoint = map (ADC_VAL[0], 0, 4095, 1900, 500);
 			Cadence_rpm = 64000/PAS_setpoint;
-			Torque_setpoint = map (ADC_VAL[1], 0, 4095, 763, 3600);
+			Torque_setpoint = map (ADC_VAL[1], 0, 4095, 910, 3600);
 			Torque_mV = map (Torque_setpoint, 0, 3600, 0, 3300);
-			if (PAS_counter > PAS_setpoint>>1) {
+			//PAS1 signal generation
+			if (PAS_counter > PAS_setpoint>>1) Q_PAS1state=1;
+			else Q_PAS1state=0;
+
+			if(Q_PAS1state&&Q_PAS1state!=Q_PAS1_old)
+			{
 				HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, 1);
 				HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, 1);
 				HAL_GPIO_WritePin(Q_PAS1_GPIO_Port, Q_PAS1_Pin, 1);
 			}
-			if (PAS_counter > PAS_setpoint) {
+			if (!Q_PAS1state&&Q_PAS1state!=Q_PAS1_old) {
 				HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, 0);
 				HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, 0);
 				HAL_GPIO_WritePin(Q_PAS1_GPIO_Port, Q_PAS1_Pin, 0);
-				PAS_counter = 0;
 			}
-			if (PAS_counter > PAS_setpoint>>2&&PAS_counter < (PAS_setpoint*3)>>2) {
+			//reset counter
+			if (PAS_counter > PAS_setpoint)PAS_counter = 0;
 
+			//PAS2 signal generation
+			if (PAS_counter > PAS_setpoint>>2&&PAS_counter < (PAS_setpoint*3)>>2) Q_PAS2state=1;
+			else Q_PAS2state=0;
+
+			if(Q_PAS2state&&Q_PAS2state!=Q_PAS2_old)
+			{
 				HAL_GPIO_WritePin(Q_PAS2_GPIO_Port, Q_PAS2_Pin, 1);
 			}
-			if (PAS_counter < PAS_setpoint>>2||PAS_counter > (PAS_setpoint*3)>>2) {
-
+			if(!Q_PAS2state&&Q_PAS2state!=Q_PAS2_old) {
+				//generate sine-shaped torque signal
+				if(JumperState)TIM1->CCR1 = (sine_curve[half_revolution_counter]*Torque_setpoint)>>8;
+				else TIM1->CCR1 = 0;
+				if (half_revolution_counter<16)half_revolution_counter++;
+				else half_revolution_counter=0;
 				HAL_GPIO_WritePin(Q_PAS2_GPIO_Port, Q_PAS2_Pin, 0);
 
 			}
+			//speed/direction signal generation
 			if(HAL_GPIO_ReadPin(Q_PAS2_GPIO_Port, Q_PAS2_Pin)!=Q_PAS2_old||HAL_GPIO_ReadPin(Q_PAS1_GPIO_Port, Q_PAS1_Pin)!=Q_PAS1_old){
 				HAL_GPIO_TogglePin(PAS_signal_GPIO_Port, PAS_signal_Pin);
-				//HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-			}
-			Q_PAS1_old= HAL_GPIO_ReadPin(Q_PAS1_GPIO_Port, Q_PAS1_Pin);
-			Q_PAS2_old= HAL_GPIO_ReadPin(Q_PAS2_GPIO_Port, Q_PAS2_Pin);
+				}
+			Q_PAS1_old= Q_PAS1state;
+			Q_PAS2_old= Q_PAS2state;
 
-			if(JumperState)TIM1->CCR1 = Torque_setpoint;
-			else TIM1->CCR1 = 0;
+
 		}
 		else{
 
@@ -233,7 +268,7 @@ int main(void)
 			Cadence_rpm=0;
 			if(JumperState){
 				Torque_mV=700;
-				TIM1->CCR1 = 1272;
+				TIM1->CCR1 = 910;
 			}
 			else {
 				Torque_mV=0;
