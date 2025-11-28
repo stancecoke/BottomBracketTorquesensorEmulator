@@ -55,6 +55,7 @@ UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
 uint16_t tim1_counter=0;
+uint16_t idle_voltage=910;
 uint16_t PAS_counter=0;
 uint16_t Torque_setpoint=1272;
 uint16_t Torque_mV=700;
@@ -215,7 +216,7 @@ int main(void)
 		if (OutputActive) {
 			PAS_setpoint = map (ADC_VAL[0], 0, 4095, 1900, 500);
 			Cadence_rpm = 64000/PAS_setpoint;
-			Torque_setpoint = map (ADC_VAL[1], 0, 4095, 910, 3600);
+			Torque_setpoint = map (ADC_VAL[1], 0, 4095, idle_voltage, 3600);
 			Torque_mV = map (Torque_setpoint, 0, 3600, 0, 3300);
 			//PAS1 signal generation
 			if (PAS_counter > PAS_setpoint>>1) Q_PAS1state=1;
@@ -251,7 +252,7 @@ int main(void)
 			//speed/direction signal generation
 			if(Q_PAS2state!=Q_PAS2_old||Q_PAS1state!=Q_PAS1_old){
 				//generate sine-shaped torque signal
-				if(JumperState)TIM1->CCR1 = (sine_curve[half_revolution_counter]*Torque_setpoint)>>8;
+				if(JumperState)TIM1->CCR1 = ((sine_curve[half_revolution_counter]*(Torque_setpoint-idle_voltage))>>8)+idle_voltage;
 				else TIM1->CCR1 = 0;
 				if (half_revolution_counter<16)half_revolution_counter++;
 				else half_revolution_counter=0;
@@ -269,7 +270,7 @@ int main(void)
 			Cadence_rpm=0;
 			if(JumperState){
 				Torque_mV=700;
-				TIM1->CCR1 = 910;
+				TIM1->CCR1 = idle_voltage;
 			}
 			else {
 				Torque_mV=0;
