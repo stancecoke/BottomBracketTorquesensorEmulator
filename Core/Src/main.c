@@ -114,7 +114,7 @@ static void MX_TIM1_Init(void);
 static void MX_TIM3_Init(void);
 /* USER CODE BEGIN PFP */
 int32_t map (int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max);
-
+void update_torque (void);
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -218,6 +218,7 @@ int main(void)
 			Cadence_rpm = 64000/PAS_setpoint;
 			Torque_setpoint = map (ADC_VAL[1], 0, 4095, idle_voltage, 3600);
 			Torque_mV = map (Torque_setpoint, 0, 3600, 0, 3300);
+			TIM1->CCR1 = Torque_setpoint;
 			//PAS1 signal generation
 			if (PAS_counter > PAS_setpoint>>1) Q_PAS1state=1;
 			else Q_PAS1state=0;
@@ -242,20 +243,17 @@ int main(void)
 
 			if(Q_PAS2state&&Q_PAS2state!=Q_PAS2_old)
 			{
+				//update_torque();
 				HAL_GPIO_WritePin(Q_PAS2_GPIO_Port, Q_PAS2_Pin, 1);
 			}
 			if(!Q_PAS2state&&Q_PAS2state!=Q_PAS2_old) {
-
+				//update_torque();
 				HAL_GPIO_WritePin(Q_PAS2_GPIO_Port, Q_PAS2_Pin, 0);
 
 			}
 			//speed/direction signal generation
 			if(Q_PAS2state!=Q_PAS2_old||Q_PAS1state!=Q_PAS1_old){
-				//generate sine-shaped torque signal
-				if(JumperState)TIM1->CCR1 = ((sine_curve[half_revolution_counter]*(Torque_setpoint-idle_voltage))>>8)+idle_voltage;
-				else TIM1->CCR1 = 0;
-				if (half_revolution_counter<16)half_revolution_counter++;
-				else half_revolution_counter=0;
+
 				HAL_GPIO_TogglePin(PAS_signal_GPIO_Port, PAS_signal_Pin);
 				}
 			Q_PAS1_old= Q_PAS1state;
@@ -734,8 +732,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	PAS_counter++;
 	if(debounce<16000)debounce++;
 }
-
-
+void update_torque (void){
+	//generate sine-shaped torque signal
+	if(JumperState)TIM1->CCR1 = ((sine_curve[half_revolution_counter]*(Torque_setpoint-idle_voltage))>>8)+idle_voltage;
+	else TIM1->CCR1 = 0;
+	if (half_revolution_counter<16)half_revolution_counter++;
+	else half_revolution_counter=0;
+}
 /* USER CODE END 4 */
 
 /**
