@@ -57,7 +57,7 @@ UART_HandleTypeDef huart1;
 uint16_t tim1_counter=0;
 uint16_t idle_voltage=910;
 uint16_t PAS_counter=0;
-uint16_t Torque_setpoint=1272;
+uint16_t Torque_setpoint=0;
 uint16_t Torque_mV=700;
 uint16_t Cadence_rpm=30;
 uint16_t PAS_setpoint=16000;
