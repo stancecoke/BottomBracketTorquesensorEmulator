@@ -218,7 +218,7 @@ int main(void)
 			Cadence_rpm = 64000/PAS_setpoint;
 			Torque_setpoint = map (ADC_VAL[1], 0, 4095, idle_voltage, 3600);
 			Torque_mV = map (Torque_setpoint, 0, 3600, 0, 3300);
-			TIM1->CCR1 = Torque_setpoint;
+			//TIM1->CCR1 = Torque_setpoint;
 			//PAS1 signal generation
 			if (PAS_counter > PAS_setpoint>>1) Q_PAS1state=1;
 			else Q_PAS1state=0;
@@ -243,11 +243,11 @@ int main(void)
 
 			if(Q_PAS2state&&Q_PAS2state!=Q_PAS2_old)
 			{
-				//update_torque();
+				update_torque();
 				HAL_GPIO_WritePin(Q_PAS2_GPIO_Port, Q_PAS2_Pin, 1);
 			}
 			if(!Q_PAS2state&&Q_PAS2state!=Q_PAS2_old) {
-				//update_torque();
+				update_torque();
 				HAL_GPIO_WritePin(Q_PAS2_GPIO_Port, Q_PAS2_Pin, 0);
 
 			}
